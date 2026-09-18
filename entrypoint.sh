@@ -49,9 +49,18 @@ echo "[airplanes-feeder] Feeder Display Name: $USER_NAME"
 FEED_HOST=$(echo "$FEED_SERVER" | cut -d: -f1)
 FEED_PORT=$(echo "$FEED_SERVER" | cut -d: -f2)
 
+# Check if BEAST_HOST is resolvable, fallback to 127.0.0.1 if host network mode is used
+if ! python3 -c "import socket; socket.gethostbyname('$BEAST_HOST')" 2>/dev/null; then
+    echo "[airplanes-feeder] Notice: '$BEAST_HOST' is not resolvable via DNS (host network mode?), falling back to 127.0.0.1..."
+    BEAST_HOST="127.0.0.1"
+    if [ "$MLAT_RESULTS_HOST" = "dump1090" ]; then
+        MLAT_RESULTS_HOST="127.0.0.1"
+    fi
+fi
+
 # Wait for local Beast source to become available
 echo "[airplanes-feeder] Waiting for Beast data source at ${BEAST_HOST}:${BEAST_PORT}..."
-while ! nc -z "$BEAST_HOST" "$BEAST_PORT" 2>/dev/null; do
+while ! python3 -c "import socket; socket.create_connection(('$BEAST_HOST', int('$BEAST_PORT')), timeout=2).close()" 2>/dev/null; do
     sleep 2
 done
 echo "[airplanes-feeder] Connected to Beast source (${BEAST_HOST}:${BEAST_PORT})!"
