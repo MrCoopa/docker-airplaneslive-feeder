@@ -1,0 +1,33 @@
+services:
+  airplaneslive:
+    build: .
+    image: airplaneslive-feeder:latest
+    container_name: airplaneslive-feeder
+    restart: unless-stopped
+    environment:
+      # Hostname oder IP deines ADS-B Empfängers / Decoders:
+      - BEAST_HOST=dump1090
+      - BEAST_PORT=30005
+
+      # Deine Antennen-Koordinaten (Pflicht für MLAT):
+      - LAT=${LAT:-50.1234}
+      - LON=${LON:-8.1234}
+      - ALT=${ALT:-180m}
+
+      # Name deiner Station auf airplanes.live:
+      - USER=${SITE_NAME:-MeinRaspi-Station}
+
+      # MLAT-Aktivierung & Rückkanal:
+      - ENABLE_MLAT=true
+      - MLAT_RESULTS_HOST=dump1090
+      - MLAT_RESULTS_PORT=30004
+
+      # Optional: Feste UUID erzwingen (ansonsten wird sie automatisch generiert und im Volume gesichert):
+      # - UUID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+
+    volumes:
+      # Persistente Station-UUID über Container-Neustarts hinweg sichern
+      - airplaneslive-data:/var/lib/airplaneslive
+
+volumes:
+  airplaneslive-data:
