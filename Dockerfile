@@ -13,9 +13,13 @@ RUN apk add --no-cache \
     python3 \
     python3-dev \
     py3-setuptools \
+    py3-pip \
     ncurses-dev \
     zlib-dev \
     zstd-dev
+
+# Install pyasyncore for Python 3.12+ backward compatibility required by mlat-client
+RUN pip install --no-cache-dir --break-system-packages --root=/src/mlat-install pyasyncore
 
 # Build lightweight readsb (net-only forwarder with beast_reduce_plus_out)
 RUN git clone --depth 1 https://github.com/wiedehopf/readsb.git /src/readsb-src && \
