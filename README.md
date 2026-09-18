@@ -1,7 +1,7 @@
 # ✈️ docker-airplaneslive
 
 [![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg?logo=docker)](https://www.docker.com/)
-[![Debian](https://img.shields.io/badge/Debian-13%20Trixie--Slim-red.svg?logo=debian)](https://www.debian.org/)
+[![Alpine](https://img.shields.io/badge/Alpine-Linux-0D597F.svg?logo=alpinelinux&logoColor=white)](https://alpinelinux.org/)
 [![airplanes.live](https://img.shields.io/badge/Feed-airplanes.live-orange.svg)](https://airplanes.live)
 
 Lightweight, modern Docker container to feed ADS-B and MLAT (Multilateration) data to [airplanes.live](https://airplanes.live/) with full support for **local MLAT return feed** into your own receiver map (e.g. `tar1090` / `dump1090` / `readsb`).
@@ -10,7 +10,7 @@ Lightweight, modern Docker container to feed ADS-B and MLAT (Multilateration) da
 
 ## 🚀 Features
 
-* **Latest Base:** Built on top of **Debian 13 (Trixie) Slim** using multi-stage builds.
+* **Ultra-Lightweight Base:** Built on top of **Alpine Linux** (~25 MB image size) using a clean multi-stage build.
 * **Low Bandwidth:** Uses high-performance `readsb` net-connector with `beast_reduce_plus_out` to stream Beast packets efficiently.
 * **Native MLAT (Multilateration):** Runs `mlat-client` to synchronize Mode-S reception times with `feed.airplanes.live:31090`.
 * **Live MLAT Return Feed:** Feeds calculated MLAT positions straight back into your local decoder (e.g. port `30004`), displaying MLAT planes on your local `tar1090` map!

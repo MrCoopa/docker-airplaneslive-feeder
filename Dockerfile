@@ -1,25 +1,21 @@
 # ========================================================
 # airplanes.live ADS-B & MLAT Feeder Container
-# Base: Debian 13 (Trixie) Slim
+# Base: Alpine Linux (Ultra-lightweight ~25 MB)
 # ========================================================
 
 # --- Stage 1: Build Stage ---
-FROM debian:trixie-slim AS builder
+FROM alpine:latest AS builder
 
-ENV DEBIAN_FRONTEND=noninteractive
-
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
+RUN apk add --no-cache \
+    build-base \
+    pkgconf \
     git \
-    pkg-config \
     python3 \
     python3-dev \
-    python3-setuptools \
-    libncurses-dev \
-    libzstd-dev \
-    zlib1g-dev \
-    ca-certificates && \
-    rm -rf /var/lib/apt/lists/*
+    py3-setuptools \
+    ncurses-dev \
+    zlib-dev \
+    zstd-dev
 
 # Build lightweight readsb (net-only forwarder with beast_reduce_plus_out)
 RUN git clone --depth 1 https://github.com/wiedehopf/readsb.git /src/readsb-src && \
@@ -34,20 +30,18 @@ RUN git clone --depth 1 https://github.com/mutability/mlat-client.git /src/mlat-
     python3 setup.py install --root=/src/mlat-install
 
 # --- Stage 2: Minimal Runtime ---
-FROM debian:trixie-slim
+FROM alpine:latest
 
-ENV DEBIAN_FRONTEND=noninteractive
-
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apk add --no-cache \
     python3 \
-    netcat-openbsd \
+    bash \
     curl \
     ca-certificates \
-    libncurses6 \
-    libzstd1 \
-    zlib1g \
+    ncurses-libs \
+    zlib \
+    zstd-libs \
     procps && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/cache/apk/*
 
 # Copy binaries and installed python packages
 COPY --from=builder /src/readsb-src/readsb /usr/local/bin/readsb
