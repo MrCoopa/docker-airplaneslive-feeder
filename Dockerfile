@@ -15,6 +15,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
     python3-dev \
     python3-setuptools \
+    libncurses-dev \
     libzstd-dev \
     zlib1g-dev \
     ca-certificates && \
@@ -42,6 +43,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     netcat-openbsd \
     curl \
     ca-certificates \
+    libncurses6 \
     libzstd1 \
     zlib1g \
     procps && \
