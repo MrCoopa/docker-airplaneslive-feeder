@@ -21,7 +21,6 @@ services:
       - ENABLE_MLAT=true
       - MLAT_RESULTS_HOST=dump1090
       - MLAT_RESULTS_PORT=30004
-
       # Optional: Feste UUID erzwingen (ansonsten wird sie automatisch generiert und im Volume gesichert):
       # - UUID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 

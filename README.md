@@ -21,38 +21,64 @@ Lightweight, modern Docker container to feed ADS-B and MLAT (Multilateration) da
 
 ## 📦 Quick Start with Docker Compose
 
-### 1. Standalone / Sidecar Setup
+### 1. Standalone Setup (e.g. in `/opt/airplaneslive`)
 
-Add the service to your existing `docker-compose.yml` (e.g. alongside `dump1090-tar1090`):
+Clone this repository and start the container in its own directory:
 
+```bash
+git clone https://github.com/MrCoopa/docker-airplaneslive-feeder.git /opt/airplaneslive
+cd /opt/airplaneslive
+```
+
+`docker-compose.yml`:
 ```yaml
 services:
   airplaneslive:
-    build: https://github.com/MrCoopa/docker-airplaneslive-feeder.git
+    build: .
+    image: airplaneslive-feeder:latest
     container_name: airplaneslive-feeder
     restart: unless-stopped
+    network_mode: host
     environment:
-      # Host or container name of your Beast data source
-      - BEAST_HOST=dump1090
+      - BEAST_HOST=127.0.0.1
       - BEAST_PORT=30005
-
-      # Exact antenna location (required for MLAT)
       - LAT=50.1234
       - LON=8.1234
-      - ALT=180m
-
-      # Feeder station display name
-      - USER=MeinRaspi-Station
-
-      # MLAT return feed to local decoder
+      - ALT=150m
+      - USER=My-Station-Name
       - ENABLE_MLAT=true
-      - MLAT_RESULTS_HOST=dump1090
+      - MLAT_RESULTS_HOST=127.0.0.1
       - MLAT_RESULTS_PORT=30004
     volumes:
       - airplaneslive-data:/var/lib/airplaneslive
 
 volumes:
   airplaneslive-data:
+```
+
+### 2. Sidecar Setup (Inside existing `docker-compose.yml`)
+
+You can also run it directly inside your existing ADS-B compose file:
+
+```yaml
+  airplaneslive:
+    build: https://github.com/MrCoopa/docker-airplaneslive-feeder.git#main
+    container_name: airplaneslive-feeder
+    restart: unless-stopped
+    depends_on:
+      - dump1090
+    environment:
+      - BEAST_HOST=dump1090
+      - BEAST_PORT=30005
+      - LAT=50.1234
+      - LON=8.1234
+      - ALT=150m
+      - USER=My-Station-Name
+      - ENABLE_MLAT=true
+      - MLAT_RESULTS_HOST=dump1090
+      - MLAT_RESULTS_PORT=30004
+    volumes:
+      - airplaneslive-data:/var/lib/airplaneslive
 ```
 
 ### 2. Start the Feeder
