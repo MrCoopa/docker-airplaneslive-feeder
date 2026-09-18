@@ -81,7 +81,7 @@ if [ "$ENABLE_MLAT" = "true" ] || [ "$ENABLE_MLAT" = "1" ]; then
         echo "[airplanes-feeder] Receiver location: LAT=${LAT}, LON=${LON}, ALT=${ALT}"
         echo "[airplanes-feeder] MLAT return feed destination: ${MLAT_RESULTS_HOST}:${MLAT_RESULTS_PORT}"
 
-        /usr/local/bin/mlat-client \
+        mlat-client \
             --input-type dump1090 \
             --input-connect "${BEAST_HOST}:${BEAST_PORT}" \
             --server "${MLAT_SERVER}" \

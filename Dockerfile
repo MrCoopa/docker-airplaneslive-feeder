@@ -54,6 +54,7 @@ COPY --from=builder /src/mlat-install/ /
 # Copy entrypoint script
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh /usr/local/bin/readsb && \
+    ln -sf /usr/bin/mlat-client /usr/local/bin/mlat-client && \
     mkdir -p /var/lib/airplaneslive
 
 VOLUME ["/var/lib/airplaneslive"]
