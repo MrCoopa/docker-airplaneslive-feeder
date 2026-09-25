@@ -49,21 +49,27 @@ echo "[airplanes-feeder] Feeder Display Name: $USER_NAME"
 FEED_HOST=$(echo "$FEED_SERVER" | cut -d: -f1)
 FEED_PORT=$(echo "$FEED_SERVER" | cut -d: -f2)
 
-# Check if BEAST_HOST is resolvable, fallback to 127.0.0.1 if host network mode is used
-if ! python3 -c "import socket; socket.gethostbyname('$BEAST_HOST')" 2>/dev/null; then
-    echo "[airplanes-feeder] Notice: '$BEAST_HOST' is not resolvable via DNS (host network mode?), falling back to 127.0.0.1..."
-    BEAST_HOST="127.0.0.1"
-    if [ "$MLAT_RESULTS_HOST" = "dump1090" ]; then
-        MLAT_RESULTS_HOST="127.0.0.1"
-    fi
-fi
-
 # Wait for local Beast source to become available
 echo "[airplanes-feeder] Waiting for Beast data source at ${BEAST_HOST}:${BEAST_PORT}..."
-while ! python3 -c "import socket; socket.create_connection(('$BEAST_HOST', int('$BEAST_PORT')), timeout=2).close()" 2>/dev/null; do
+while true; do
+    # 1. Try connecting to configured BEAST_HOST
+    if python3 -c "import socket; socket.create_connection(('$BEAST_HOST', int('$BEAST_PORT')), timeout=2).close()" 2>/dev/null; then
+        echo "[airplanes-feeder] Connected to Beast source (${BEAST_HOST}:${BEAST_PORT})!"
+        break
+    fi
+
+    # 2. If BEAST_HOST is 'dump1090' and 127.0.0.1:BEAST_PORT is actually open (host network mode), fallback
+    if [ "$BEAST_HOST" = "dump1090" ] && python3 -c "import socket; socket.create_connection(('127.0.0.1', int('$BEAST_PORT')), timeout=1).close()" 2>/dev/null; then
+        echo "[airplanes-feeder] Notice: Beast data source found at 127.0.0.1:${BEAST_PORT} (host network mode). Using 127.0.0.1..."
+        BEAST_HOST="127.0.0.1"
+        if [ "$MLAT_RESULTS_HOST" = "dump1090" ]; then
+            MLAT_RESULTS_HOST="127.0.0.1"
+        fi
+        break
+    fi
+
     sleep 2
 done
-echo "[airplanes-feeder] Connected to Beast source (${BEAST_HOST}:${BEAST_PORT})!"
 
 # 1. Start Beast Forwarder to airplanes.live
 echo "[airplanes-feeder] Starting Beast forwarder to ${FEED_HOST}:${FEED_PORT} (protocol: beast_reduce_plus_out)..."

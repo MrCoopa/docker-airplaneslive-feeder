@@ -27,9 +27,10 @@ RUN git clone --depth 1 https://github.com/wiedehopf/readsb.git /src/readsb-src 
     make -j$(nproc) RTLSDR=no BLADERF=no HACKRF=no LIMESDR=no SOAPYSDR=no OPTIMIZE="-O3" readsb && \
     strip /src/readsb-src/readsb
 
-# Build mlat-client
+# Build mlat-client and patch OutputConnector describe bug
 RUN git clone --depth 1 https://github.com/mutability/mlat-client.git /src/mlat-client && \
     cd /src/mlat-client && \
+    sed -i 's/what=self\.describe()/what=self.connection_factory.describe()/g' mlat/client/output.py && \
     python3 setup.py build && \
     python3 setup.py install --root=/src/mlat-install
 
