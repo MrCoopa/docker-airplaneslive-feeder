@@ -27,10 +27,10 @@ RUN git clone --depth 1 https://github.com/wiedehopf/readsb.git /src/readsb-src 
     make -j$(nproc) RTLSDR=no BLADERF=no HACKRF=no LIMESDR=no SOAPYSDR=no OPTIMIZE="-O3" readsb && \
     strip /src/readsb-src/readsb
 
-# Build mlat-client and patch OutputConnector describe bug
+# Build mlat-client and patch missing describe() on OutputConnector
 RUN git clone --depth 1 https://github.com/mutability/mlat-client.git /src/mlat-client && \
     cd /src/mlat-client && \
-    sed -i 's/what=self\.describe()/what=self.connection_factory.describe()/g' mlat/client/output.py && \
+    python3 -c "p = 'mlat/client/output.py'; s = open(p).read().replace('class OutputConnector:\n    reconnect_interval = 30.0', 'class OutputConnector:\n    reconnect_interval = 30.0\n\n    def describe(self):\n        return self.connection_factory.describe()'); open(p, 'w').write(s)" && \
     python3 setup.py build && \
     python3 setup.py install --root=/src/mlat-install
 
